@@ -1,9 +1,14 @@
 #include <iostream>
 #include <termios.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+//#include <Ncurses>
 using namespace std;
+int kbhit(void);
 
 int height = 20, width = 30;
-int x, y, foodx, foody, score;
+int y = height / 2, x = width / 2, foodx, foody, score;
 bool gameover = false;
 enum dir
 {
@@ -18,14 +23,11 @@ void board();
 void input();
 void move();
 void logic();
+void foodgen();
 int main()
 {
-    //struct termios newt;
-    //newt.c_lflag &= ~(ICANON);
-    y = height / 2;
-    x = width / 2;
-    foodx = rand() % width - 1;
-    foody = rand() % height - 1;
+
+    foodgen();
     system("stty -icanon");
     board();
     while (!gameover)
@@ -33,7 +35,6 @@ int main()
         input();
         move();
         logic();
-
         board();
     }
     cout << "\nGame Over";
@@ -47,11 +48,8 @@ void board()
     {
         for (int j = 0; j <= width; j++)
         {
-            if (x <= 0 || x >= width || y <= 0 || y >= height)
-            {
-                gameover = true;
-            }
-            else if (i == y && j == x)
+
+            if (i == y && j == x)
             {
                 cout << "*";
             }
@@ -80,25 +78,28 @@ void board()
 
 void input()
 {
-    fflush(stdout);
-    switch (getchar())
+    sleep(1);
+    if (kbhit())
     {
+        switch (getchar())
+        {
 
-    case 'w':
-        sdir = UP;
-        break;
-    case 's':
-        sdir = DOWN;
-        break;
-    case 'a':
-        sdir = LEFT;
-        break;
-    case 'd':
-        sdir = RIGHT;
-        break;
-    case 'x':
-        gameover = true;
-        break;
+        case 'w':
+            sdir = UP;
+            break;
+        case 's':
+            sdir = DOWN;
+            break;
+        case 'a':
+            sdir = LEFT;
+            break;
+        case 'd':
+            sdir = RIGHT;
+            break;
+        case 'x':
+            gameover = true;
+            break;
+        }
     }
 }
 
@@ -126,7 +127,43 @@ void logic()
     if (x == foodx && y == foody)
     {
         score++;
-        foodx = rand() % width;
-        foody = rand() % height;
+        foodgen();
     }
+    if (x <= 0 || x >= width || y <= 0 || y >= height)
+    {
+        gameover = true;
+    }
+}
+
+void foodgen()
+{
+    foodx = rand() % width - 1;
+    foody = rand() % height - 1;
+}
+
+int kbhit(void)
+{
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    ch = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+    if (ch != EOF)
+    {
+        ungetc(ch, stdin);
+        return 1;
+    }
+
+    return 0;
 }
