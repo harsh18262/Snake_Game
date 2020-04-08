@@ -80,16 +80,16 @@ void board()
             }
             else
             {
-                bool tailp=false;
+                bool tailp = false;
                 for (int k = 0; k < ntail; k++)
                 {
                     if (tailx[k] == j && taily[k] == i)
                     {
-                        tailp=true;
+                        tailp = true;
                         cout << "*";
                     }
                 }
-                if (fl == 0)
+                if (tailp == 0)
                 {
                     cout << " ";
                 }
