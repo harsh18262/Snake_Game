@@ -28,6 +28,7 @@ void input();
 void move();
 void logic();
 void foodgen();
+void tailgen();
 int kbhit(void);
 void SetCursorPos(int XPos, int YPos);
 
@@ -79,12 +80,12 @@ void board()
             }
             else
             {
-                int fl = 0;
+                bool tailp=false;
                 for (int k = 0; k < ntail; k++)
                 {
                     if (tailx[k] == j && taily[k] == i)
                     {
-                        fl = 1;
+                        tailp=true;
                         cout << "*";
                     }
                 }
@@ -107,18 +108,22 @@ void input()
         {
 
         case 'w':
-            sdir = UP;
+            if (sdir != DOWN)
+                sdir = UP;
             break;
         case 's':
-            sdir = DOWN;
+            if (sdir != UP)
+                sdir = DOWN;
             break;
         case 'a':
-            sdir = LEFT;
+            if (sdir != RIGHT)
+                sdir = LEFT;
             break;
         case 'd':
-            sdir = RIGHT;
+            if (sdir != LEFT)
+                sdir = RIGHT;
             break;
-        case 'x':
+        case 27:
             gameover = true;
             break;
         }
@@ -127,20 +132,7 @@ void input()
 
 void move()
 {
-    int prevx = tailx[0];
-    int prevy = taily[0];
-    int prev2x, prev2y;
-    tailx[0] = x;
-    taily[0] = y;
-    for (int i = 1; i < ntail; i++)
-    {
-        prev2x = tailx[i];
-        prev2y = taily[i];
-        tailx[i] = prevx;
-        taily[i] = prevy;
-        prevx = prev2x;
-        prevy = prev2y;
-        }
+    tailgen();
     switch (sdir)
     {
     case UP:
@@ -170,6 +162,13 @@ void logic()
     {
         gameover = true;
     }
+    for (int i = 0; i < ntail; i++)
+    {
+        if (x == tailx[i] && y == taily[i])
+        {
+            gameover = true;
+        }
+    }
 }
 
 void foodgen()
@@ -179,6 +178,24 @@ void foodgen()
     if (foodx == 0 || foody == 0)
     {
         foodgen();
+    }
+}
+
+void tailgen()
+{
+    int prevx = tailx[0];
+    int prevy = taily[0];
+    int prev2x, prev2y;
+    tailx[0] = x;
+    taily[0] = y;
+    for (int i = 1; i < ntail; i++)
+    {
+        prev2x = tailx[i];
+        prev2y = taily[i];
+        tailx[i] = prevx;
+        taily[i] = prevy;
+        prevx = prev2x;
+        prevy = prev2y;
     }
 }
 
