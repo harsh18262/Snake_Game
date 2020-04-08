@@ -3,33 +3,40 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-//#include <Ncurses>
-using namespace std;
-int kbhit(void);
+#include <ctime>
+#include <stdlib.h>
 
+using namespace std;
+
+//global variable declarations
 int height = 20, width = 30;
 int y = height / 2, x = width / 2, foodx, foody, score;
 bool gameover = false;
+int tailx[100], taily[100], ntail = 0;
 enum dir
 {
-    STOP,
     UP,
     DOWN,
     LEFT,
     RIGHT
 };
 dir sdir;
+
+//function declarations
 void board();
 void input();
 void move();
 void logic();
 void foodgen();
+int kbhit(void);
+void SetCursorPos(int XPos, int YPos);
+
 int main()
 {
 
-    foodgen();
     system("stty -icanon");
     board();
+    foodgen();
     while (!gameover)
     {
         input();
@@ -37,13 +44,17 @@ int main()
         logic();
         board();
     }
-    cout << "\nGame Over";
+    cout << "\nGame Over\n";
     return 0;
 }
 
 void board()
 {
+
+    void SetCursorPos();
+
     system("clear");
+    cout << "\nscore: " << score << endl;
     for (int i = 0; i <= height; i++)
     {
         for (int j = 0; j <= width; j++)
@@ -51,7 +62,7 @@ void board()
 
             if (i == y && j == x)
             {
-                cout << "*";
+                cout << "@";
             }
             else if (i == foody && j == foodx)
             {
@@ -68,17 +79,28 @@ void board()
             }
             else
             {
-                cout << " ";
+                int fl = 0;
+                for (int k = 0; k < ntail; k++)
+                {
+                    if (tailx[k] == j && taily[k] == i)
+                    {
+                        fl = 1;
+                        cout << "*";
+                    }
+                }
+                if (fl == 0)
+                {
+                    cout << " ";
+                }
             }
         }
         cout << endl;
     }
-    cout << "\nscore: " << score;
 }
 
 void input()
 {
-    sleep(1);
+    usleep(300000);
     if (kbhit())
     {
         switch (getchar())
@@ -105,6 +127,20 @@ void input()
 
 void move()
 {
+    int prevx = tailx[0];
+    int prevy = taily[0];
+    int prev2x, prev2y;
+    tailx[0] = x;
+    taily[0] = y;
+    for (int i = 1; i < ntail; i++)
+    {
+        prev2x = tailx[i];
+        prev2y = taily[i];
+        tailx[i] = prevx;
+        taily[i] = prevy;
+        prevx = prev2x;
+        prevy = prev2y;
+        }
     switch (sdir)
     {
     case UP:
@@ -127,6 +163,7 @@ void logic()
     if (x == foodx && y == foody)
     {
         score++;
+        ntail++;
         foodgen();
     }
     if (x <= 0 || x >= width || y <= 0 || y >= height)
@@ -139,6 +176,10 @@ void foodgen()
 {
     foodx = rand() % width - 1;
     foody = rand() % height - 1;
+    if (foodx == 0 || foody == 0)
+    {
+        foodgen();
+    }
 }
 
 int kbhit(void)
@@ -166,4 +207,9 @@ int kbhit(void)
     }
 
     return 0;
+}
+
+void SetCursorPos(int XPos, int YPos)
+{
+    printf("\033[%d;%dH", YPos + 1, XPos + 1);
 }
