@@ -72,11 +72,11 @@ void board()
 
             else if (i == 0 || i == height)
             {
-                cout << "#";
+                cout << "-";
             }
             else if (j == 0 || j == width)
             {
-                cout << "#";
+                cout << "|";
             }
             else
             {
@@ -162,11 +162,23 @@ void logic()
     {
         gameover = true;
     }
+    // for (int i = 0; i < ntail; i++)
+    // {
+    //     if (x == tailx[i] && y == taily[i])
+    //     {
+    //         gameover = true;
+    //     }
+    // }
     for (int i = 0; i < ntail; i++)
     {
         if (x == tailx[i] && y == taily[i])
         {
-            gameover = true;
+            for (int j = i; j < ntail; j++)
+            {
+                tailx[j] = taily[j] = 0;
+            }
+            ntail = ntail - i;
+            score = score - i;
         }
     }
 }
@@ -175,7 +187,7 @@ void foodgen()
 {
     foodx = rand() % width - 1;
     foody = rand() % height - 1;
-    if (foodx == 0 || foody == 0)
+    if (foodx <= 0 || foody <= 0)
     {
         foodgen();
     }
