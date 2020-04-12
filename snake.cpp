@@ -12,7 +12,7 @@ using namespace std;
 int height = 20, width = 30;
 int y = height / 2, x = width / 2, foodx, foody, score;
 bool gameover = false;
-int tailx[100], taily[100], ntail = 0;
+int tailx[100], taily[100], ntail = 0, diff, diffl;
 char set[5];
 enum dir
 {
@@ -33,11 +33,13 @@ void tailgen();
 int kbhit(void);
 void SetCursorPos(int XPos, int YPos);
 void settings();
+void difficulty();
 
 int main()
 {
 
   system("stty -icanon");
+  difficulty();
   settings();
   board();
   foodgen();
@@ -104,7 +106,7 @@ void board()
 
 void input()
 {
-  usleep(300000);
+  usleep(diffl);
   if (kbhit())
   {
     switch (getchar())
@@ -161,14 +163,14 @@ void logic()
     ntail++;
     foodgen();
   }
-  if (set[0] == 'y' || set[0] == 'Y')
+  if (set[0] == 'n' || set[0] == 'N')
   {
     if (x <= 0 || x >= width || y <= 0 || y >= height)
     {
       gameover = true;
     }
   }
-  if (set[0] == 'n' || set[0] == 'N')
+  if (set[0] == 'y' || set[0] == 'Y')
   {
     if (x <= 0)
     {
@@ -242,13 +244,29 @@ void tailgen()
     prevy = prev2y;
   }
 }
-
+void difficulty()
+{
+  cout << "1)Easy\n2)Normal\n3)Hard\n";
+  cin >> diff;
+  if (diff == 1)
+  {
+    diffl = 300000;
+  }
+  else if (diff == 2)
+  {
+    diffl = 200000;
+  }
+  else if (diff == 3)
+  {
+    diffl = 100000;
+  }
+}
 void settings()
 {
   printf("do you want passthrough wall\n");
-  scanf("%c", &set[0]);
+  cin >> set[0];
   printf("do you want to end the game when you cut the tail\n");
-  scanf("%c", &set[1]);
+  cin >> set[1];
 }
 
 int kbhit(void)
