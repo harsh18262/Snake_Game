@@ -158,9 +158,25 @@ void logic()
         ntail++;
         foodgen();
     }
-    if (x <= 0 || x >= width || y <= 0 || y >= height)
+  /*  if (x <= 0 || x >= width || y <= 0 || y >= height)
     {
         gameover = true;
+    }*/
+    if(x<=0)
+    {
+        x=width-1;
+    }
+    if(x>=width)
+    {
+        x=0;
+    }
+    if(y<=0)
+    {
+        y=height-1;
+    }
+    if(y>=height)
+    {
+        y=0;
     }
     // for (int i = 0; i < ntail; i++)
     // {
