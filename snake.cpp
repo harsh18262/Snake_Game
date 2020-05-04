@@ -37,6 +37,7 @@ void difficulty();
 
 int main()
 {
+  srand(clock());
 
   system("stty -icanon");
   difficulty();
